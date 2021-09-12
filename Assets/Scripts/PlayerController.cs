@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerScript : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
+    #region Variables
+
     // Walk speed
     [SerializeField] private float _walkSpeed;
 
@@ -16,6 +18,13 @@ public class PlayerScript : MonoBehaviour
     private float _speedSmoothVelocity;
     private float _currentSpeed;
 
+    // Camera transform
+    [SerializeField]private Transform _cameraTransform;
+
+    #endregion
+
+    #region Unity
+
     // Update is called once per frame
     void Update()
     {
@@ -27,7 +36,7 @@ public class PlayerScript : MonoBehaviour
         // Check rotation
         if (inputDir != Vector2.zero)
         {
-            float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg;
+            float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
             transform.eulerAngles = Vector3.up 
                 * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation,ref _turnSmoothVelocity, _turnSmoothTime);
         }
@@ -40,4 +49,6 @@ public class PlayerScript : MonoBehaviour
         // Move character
         transform.Translate(transform.forward * _currentSpeed * Time.deltaTime, Space.World);
     }
+
+    #endregion
 }
