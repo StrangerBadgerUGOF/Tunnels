@@ -435,6 +435,7 @@ MonoBehaviour:
   _runSpeed: 3
   _jumpForce: 25
   _fallMultiplier: 8
+  _strafeForce: 25
   _turnSmoothTime: 0.2
   _speedSmoothTime: 0.05
   _cameraTransform: {fileID: 963194228}

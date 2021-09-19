@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _jumpForce;
     [SerializeField] private float _fallMultiplier;
 
+    // Strafe force
+    [SerializeField] private float _strafeForce;
+
     // Turn smooth time
     [SerializeField] private float _turnSmoothTime = 0.2f;
     private float _turnSmoothVelocity;
@@ -77,9 +80,16 @@ public class PlayerController : MonoBehaviour
             isRunning = true;
         }
 
+        // Jump check
         if (Input.GetKeyDown(KeyCode.Space) == true)
         {
             _playerRigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+        }
+
+        // Strafe check
+        if (Input.GetKeyDown(KeyCode.LeftControl) == true)
+        {
+            _playerRigidbody.AddForce(transform.forward * _strafeForce, ForceMode.Impulse);
         }
 
         // Checking what type of movement we have 
