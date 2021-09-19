@@ -6,8 +6,12 @@ public class PlayerController : MonoBehaviour
 {
     #region Variables
 
+    // Player rigidbody
+    [SerializeField] private Rigidbody _playerRigidbody;
+
     // Walk speed
     [SerializeField] private float _walkSpeed;
+    [SerializeField] private float _runSpeed;
 
     // Turn smooth time
     [SerializeField] private float _turnSmoothTime = 0.2f;
@@ -28,6 +32,24 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckInput();
+    }
+
+    private void FixedUpdate()
+    {
+        // Move character
+        _playerRigidbody.AddForce(transform.forward * _currentSpeed, ForceMode.Impulse);
+    }
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Checks input of user
+    /// </summary>
+    private void CheckInput()
+    {
         // Getting input
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         // Making input normalized
@@ -37,17 +59,22 @@ public class PlayerController : MonoBehaviour
         if (inputDir != Vector2.zero)
         {
             float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
-            transform.eulerAngles = Vector3.up 
-                * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation,ref _turnSmoothVelocity, _turnSmoothTime);
+            transform.eulerAngles = Vector3.up
+                * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _turnSmoothVelocity, _turnSmoothTime);
         }
 
+        // Running check
+        bool isRunning = false;
+        if (Input.GetKey(KeyCode.LeftShift) == true)
+        {
+            isRunning = true;
+        }
+        // Checking what type of movement we have 
+        float currentSpeed = isRunning == true ? _runSpeed : _walkSpeed;
         // Getting target speed
-        float targetSpeed = _walkSpeed * inputDir.magnitude;
+        float targetSpeed = currentSpeed * inputDir.magnitude;
         // Getting current speed
         _currentSpeed = Mathf.SmoothDamp(_currentSpeed, targetSpeed, ref _speedSmoothVelocity, _speedSmoothTime);
-
-        // Move character
-        transform.Translate(transform.forward * _currentSpeed * Time.deltaTime, Space.World);
     }
 
     #endregion
