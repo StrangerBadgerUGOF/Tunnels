@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
 {
     #region Variables
 
+    // Ray cast length
+    private const float RAY_Z_SCALAR_INCREASE = 1000;
+
     // Camera transform
     [SerializeField] private Transform _cameraTransform;
     // Player rigidbody
@@ -61,6 +64,8 @@ public class PlayerController : MonoBehaviour
     // Start function
     private void Start()
     {
+        // Lock cursor
+        Cursor.lockState = CursorLockMode.Locked;
         // Initialize variables
         _walkSpeed = _standingSpeed.x;
         _runSpeed = _standingSpeed.y;
@@ -84,6 +89,13 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         MovementInput();
+        InteractionCheck();
+
+       // For debugging
+        Vector3 posToRayFrom, posToRayTo;
+        posToRayFrom = Camera.main.transform.position;
+        posToRayTo = Camera.main.transform.position + Camera.main.transform.forward * RAY_Z_SCALAR_INCREASE;
+        Debug.DrawRay(posToRayFrom, posToRayTo, Color.red);
     }
 
     // Fixed update is called for physics
@@ -154,6 +166,51 @@ public class PlayerController : MonoBehaviour
         float targetSpeed = currentSpeed * inputDir.magnitude;
         // Getting current speed
         _currentSpeed = Mathf.SmoothDamp(_currentSpeed, targetSpeed, ref _speedSmoothVelocity, _speedSmoothTime);
+    }
+
+    /// <summary>
+    /// Check interactable objects
+    /// </summary>
+    private void InteractionCheck()
+    {
+        // Checking if player clicked on field
+        if (Input.GetMouseButtonDown(0) == true)
+        {
+            // Ray cast from camera
+            RaycastHit checkRay = RayCastFromCamera();
+            // Check raycast 
+            if (checkRay.collider == null) return;
+            // Check, if it is interactable object
+            Interactable interactObject = checkRay.collider.gameObject.GetComponent<Interactable>();
+            if (interactObject != null)
+            {
+                // Try to interact with object
+                interactObject.TryInteract(transform);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Ray cast check
+    /// </summary>
+    /// <returns></returns>
+    private RaycastHit RayCastFromCamera()
+    {
+        // Raycast from camera to point where it looks
+        Vector3 posToRayFrom, posToRayTo;
+        posToRayFrom = Camera.main.transform.position;
+        posToRayTo = Camera.main.transform.position + Camera.main.transform.forward * RAY_Z_SCALAR_INCREASE;
+        // Get all objects, which were on the path of raycast
+        RaycastHit[] raycastHits = Physics.RaycastAll(posToRayFrom, posToRayTo);
+        // Go through all objects, until you get non-player one
+        for (int i = 0; i < raycastHits.Length; i++)
+        {
+            if (raycastHits[i].collider.gameObject != gameObject)
+            {
+                return raycastHits[i];
+            }
+        }
+        return new RaycastHit();
     }
 
     /// <summary>

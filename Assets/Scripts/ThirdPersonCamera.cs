@@ -10,6 +10,8 @@ public class ThirdPersonCamera : MonoBehaviour
     [SerializeField] private float _mouseSensitivity = 10;
     // Target to follow
     [SerializeField] private Transform _target;
+    // Target offset 
+    [SerializeField] private Vector3 _targetOffset;
     // Distance to keep from target
     [SerializeField] private float _distanceFromTarget = 2;
     // Pitch minimum and maximum
@@ -43,7 +45,7 @@ public class ThirdPersonCamera : MonoBehaviour
         transform.eulerAngles = currentRotation;
 
         // Set camera position
-        transform.position = _target.position - transform.forward * _distanceFromTarget;
+        transform.position = _target.position + _targetOffset - transform.forward * _distanceFromTarget;
     }
 
     #endregion
